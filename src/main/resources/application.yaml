@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: PlatformAPI
+  profiles:
+    active: '@app.profile@'
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  server:
+    port: 8080
+  cloud:
+    kubernetes:
+      config:
+        name: database-config
+        namespace: backend
+        sources:
+          - name: database-config
+  file:
+    upload-dir: /mnt/c/WORKSPACE/wsl/k8yml/spring
