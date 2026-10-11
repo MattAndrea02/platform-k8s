@@ -17,6 +17,10 @@ spec:
       containers:
         - name: postgres
           image: postgres:16
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh","-c","sleep 20 && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d $POSTGRES_DB -U $POSTGRES_USER -c 'CREATE TABLE IF NOT EXISTS healthcheck (id SERIAL PRIMARY KEY, status VARCHAR(64));'"]
           ports:
             - containerPort: 5432
           env:
