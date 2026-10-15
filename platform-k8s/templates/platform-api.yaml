@@ -39,7 +39,7 @@ spec:
   selector:
     matchLabels:
       app: platform-api-k8s
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -71,12 +71,29 @@ spec:
                 secretKeyRef:
                   name: database-credentials
                   key: POSTGRES_PASSWORD
-          initContainers:
-          - name: wait-for-postgres
-            image: postgres:16-alpine
-            command: ['sh', '-c']
-            args:
-              - until pg_isready -h $DB_HOST -p 5432 -U $POSTGRES_USER -d $POSTGRES_DB; do echo "Waiting for PostgreSQL"; sleep 2; done
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:16-alpine
+          command: ['sh', '-c']
+          restartPolicy: Always
+          args:
+            - until pg_isready -h $DB_HOST -p 5432 -U $POSTGRES_USER -d $POSTGRES_DB; do echo "Waiting for PostgreSQL"; sleep 2; done
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: database-config
+                  key: HOST
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: database-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_USER
+                  name: database-credentials
           livenessProbe:
             httpGet:
               path: /api/health
