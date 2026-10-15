@@ -8,6 +8,7 @@ metadata:
     reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
     reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "backend,postgres"
 data:
-  postgres_db: appdb
-  postgres_user: appuser
-  HOST: postgres.postgres.svc.cluster.local
+  POSTGRES_DB: appdb
+  POSTGRES_USER: appuser
+  HOST: {{ .Values.database.internalHost }}
+  initdb.sql: {{ .Files.Get "initdb.sql" | indent 4 }}

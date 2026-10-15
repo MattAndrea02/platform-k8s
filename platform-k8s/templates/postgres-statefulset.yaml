@@ -20,7 +20,10 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh","-c","sleep 20 && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d $POSTGRES_DB -U $POSTGRES_USER -c 'CREATE TABLE IF NOT EXISTS healthcheck (id SERIAL PRIMARY KEY, status VARCHAR(64));'"]
+                command:
+                  - /bin/sh
+                  - -ec
+                  - sleep 20 && PGPASSWORD="$POSTGRES_PASSWORD" psql -w -d "$POSTGRES_DB" -U "$POSTGRES_USER" -v ON_ERROR_STOP=1 -f /etc/database-config/initdb.sql
 
           ports:
             - containerPort: 5432
@@ -32,14 +35,19 @@ spec:
                   key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
-                configMapKeyRef:
-                  name: database-config
-                  key: postgres_user
+                secretKeyRef:
+                  name: database-credentials
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: database-credentials
-                  key: postgres_password
+                  key: POSTGRES_PASSWORD
+            - name: PGUSER
+              valueFrom:
+                configMapKeyRef:
+                  name: database-config
+                  key: POSTGRES_USER
           resources:
             requests:
               cpu: "250m"
@@ -64,9 +72,15 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 10
           volumeMounts:
+            - name: database-init
+              mountPath: /etc/database-config
+              readOnly: true
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
       volumes:
+        - name: database-init
+          configMap:
+            name: database-config
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: postgres-pvc
