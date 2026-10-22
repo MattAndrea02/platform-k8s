@@ -74,6 +74,8 @@ resource "libvirt_volume" "master_disk" {
 
 resource "libvirt_domain" "k8s-master" {
   count = 1
+  
+  running = true
 
   name        = "k8s-master-${count.index + 1}"
   memory      = 4000
