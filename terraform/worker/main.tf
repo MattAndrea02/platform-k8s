@@ -11,26 +11,8 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-resource "libvirt_pool" "base-image-pool" {
-  name = "base-image-pool"
-  type = "dir"
-  target = {
-    path = "/data/libvirt/base-image-pool"
-  }
-}
-resource "libvirt_pool" "cloud-init-pool" {
-  name = "cloud-init-pool"
-  type = "dir"
-  target = {
-    path = "/data/libvirt/cloud-init-pool"
-  }
-}
-
-resource "libvirt_pool" "vm_disks" {
-  name = "vm-disks"
-  type = "dir"
-
-  target = {
-    path = "/data/libvirt/vm-disks"
-  }
+locals {
+  base_image_pool = "base-image-pool"
+  cloud_init_pool = "cloud-init-pool"
+  vm_disk_pool    = "vm-disks"
 }

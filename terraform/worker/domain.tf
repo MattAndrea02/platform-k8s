@@ -20,7 +20,7 @@ resource "libvirt_cloudinit_disk" "worker_cloudinit" {
 
 resource "libvirt_volume" "worker_cloudinit_iso" {
   name = "worker-1-cloudinit.iso"
-  pool = libvirt_pool.cloud-init-pool.name
+  pool = local.cloud_init_pool
 
   target = {
     format = {
@@ -36,8 +36,8 @@ resource "libvirt_volume" "worker_cloudinit_iso" {
 }
 
 resource "libvirt_volume" "debian_base" {
-  name = "debian-13-base.qcow2"
-  pool = libvirt_pool.base-image-pool.name
+  name = "debian-13-worker-base.qcow2"
+  pool = local.base_image_pool
 
   target = {
     format = {
@@ -54,7 +54,7 @@ resource "libvirt_volume" "debian_base" {
 
 resource "libvirt_volume" "worker_disk" {
   name     = "worker-1.qcow2"
-  pool     = libvirt_pool.vm_disks.name
+  pool     = local.vm_disk_pool
   capacity = 21474836480 # 20 GiB
 
   target = {
@@ -74,7 +74,7 @@ resource "libvirt_volume" "worker_disk" {
 
 resource "libvirt_domain" "k8s-worker" {
   count = 1
-
+  running = true
   name        = "worker-${count.index + 1}"
   memory      = 3096
   memory_unit = "MiB"
