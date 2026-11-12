@@ -1,0 +1,27 @@
+---
+control_plane_hostname: k8s-master
+control_plane_user: master
+control_plane_group: wheel
+ssh_public_key_file: ~/.ssh/id_rsa.pub
+ssh_public_key: "{{ lookup('ansible.builtin.file', ssh_public_key_file) }}"
+user_password_hash: '$6$.NO1xMXBmPli7nXx$flG9pE.4yUaMKSIQ8w7yXWpxkXxXrfW7eUH7zTIT4wYR2WeVuV/14NEfPJqfwnI/BSjRt/DEn6eDcU8laaZ6Q1'
+ssh_permit_root_login: 'yes'
+ssh_password_authentication: 'yes'
+
+# Repository minor version; installed Kubernetes packages are held.
+kubernetes_version: v1.37
+kubernetes_repository: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/"
+kubernetes_packages:
+  - kubelet
+  - kubeadm
+  - kubectl
+pod_network_cidr: 10.244.0.0/16
+container_runtime_endpoint: unix:///run/containerd/containerd.sock
+kubelet_fail_swap_on: false
+# Additional kubelet flags, excluding --fail-swap-on (managed above).
+kubelet_extra_args: ''
+base_packages:
+  - ca-certificates
+  - curl
+  - sudo
+  - containerd
